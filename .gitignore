@@ -1,0 +1,9 @@
+.idea/
+*.iws
+/out/
+.idea_modules/
+.gradle
+/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
