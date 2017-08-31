@@ -57,10 +57,10 @@ public class Main {
                 final int messageCount = declareOk.getMessageCount();
                 final int consumerCount = declareOk.getConsumerCount();
                 if (messageCount - consumerCount > 5) {
-                    logger.info("Need to scale up");
+                    logger.info("Found {} messages for {} consumers -> need to scale up", messageCount, consumerCount);
                     upscale.inc();
                 } else if (messageCount <= 2) {
-                    logger.info("Need to scale down");
+                    logger.info("Found {} messages for {} consumers -> need to scale down", messageCount, consumerCount);
                     downscale.inc();
                 }
             } catch (Exception e) {
