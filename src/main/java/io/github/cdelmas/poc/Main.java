@@ -1,7 +1,6 @@
 package io.github.cdelmas.poc;
 
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,8 +43,9 @@ public class Main {
         }
 
         logger.info("Connection to RabbitMQ");
+        final String rabbitUri = System.getenv("RABBIT_URI");
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setUri(System.getenv("RABBIT_URI"));
+        connectionFactory.setUri(rabbitUri);
         connectionFactory.setMetricsCollector(new StandardMetricsCollector(metrics));
         final Connection connection = connectionFactory.newConnection();
 
@@ -55,11 +55,12 @@ public class Main {
             try {
                 final AMQP.Queue.DeclareOk declareOk = channel.queueDeclare("in-queue", true, false, false, new HashMap<>());
                 final int messageCount = declareOk.getMessageCount();
-                if (messageCount > 5) {
-                    // TODO upscale
+                final int consumerCount = declareOk.getConsumerCount();
+                if (messageCount - consumerCount > 5) {
+                    logger.info("Need to scale up");
                     upscale.inc();
-                } else if(messageCount <= 2) {
-                    // TODO downscale
+                } else if (messageCount <= 2) {
+                    logger.info("Need to scale down");
                     downscale.inc();
                 }
             } catch (Exception e) {
